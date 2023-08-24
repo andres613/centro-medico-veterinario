@@ -1,27 +1,34 @@
-import { useState } from 'react';
+import { useRef } from 'react';
+import { useSerializeFormData } from '../hook/useSerializeFormData';
+import { useValidateFormData } from '../hook/useValidateFormData';
 
 export const Formulario = () => {
-    const [nombreMascota, setNombreMascota] = useState('');
-    const [holderPet, setHolderPet] = useState('');
-    const [email, setEmail] = useState('');
-    const [date, setDate] = useState('');
-    const [observations, setObservations] = useState('');
+    const form = useRef(null);
+    const { serialize } = useSerializeFormData();
+    const { validate } = useValidateFormData();
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
+    const handleSubmit = () => {
+        const formData = serialize(form.current);
 
-        const formData = {
-            nombreMascota,
-            holderPet,
-            email,
-            date,
-            observations
+        if(!validate(formData)) {
+            alert("Faltan campos por diligenciar");
+            return;
         }
 
-        if(Object.values(formData).some(v => !v)) return;
+        sendData(formData);
 
-        console.log(formData);
-    } 
+        resetFields(formData, form.current);
+    }
+
+    const sendData = (data) => {
+        console.log(data)
+    }
+
+    const resetFields = (formData, form) => {
+        Object.entries(formData).forEach(([key, value]) => {
+            form.elements[key].value = "";
+        });
+    }
 
     return (
         <div className="mx-5 md:w-1/2 lg:w-2/5">
@@ -34,7 +41,7 @@ export const Formulario = () => {
             </p>
             {/* formulario */}
             <form
-                onSubmit={handleSubmit} 
+                ref={form}
                 className="px-5 py-10 mb-10 bg-white rounded-lg shadow-md"
             >
                 <div className="mb-5">
@@ -46,8 +53,9 @@ export const Formulario = () => {
                         type="text"
                         placeholder="Nombre de la Mascota"
                         className="w-full p-2 mt-2 placeholder-gray-400 border-2 rounded-md"
-                        value={nombreMascota}
-                        onChange={e => setNombreMascota(e.target.value)}
+                        // value={nombreMascota}
+                        // onChange={e => setNombreMascota(e.target.value)}
+                        name="mascota"
                     />  
                     <br />
                     <br />
@@ -59,8 +67,9 @@ export const Formulario = () => {
                         type="text"
                         placeholder="Nomber Tenedor"
                         className="w-full p-2 mt-2 placeholder-gray-400 border-2 rounded-md"
-                        value={holderPet}
-                        onChange={e => setHolderPet(e.target.value)}
+                        // value={holderPet}
+                        // onChange={e => setHolderPet(e.target.value)}
+                        name="holdersPet"
                     /> 
                     <br />
                     <br />
@@ -71,8 +80,9 @@ export const Formulario = () => {
                         type="email"
                         placeholder="Correo electrónico"
                         className="w-full p-2 mt-2 placeholder-gray-400 border-2 rounded-md"
-                        value={email}
-                        onChange={e => setEmail(e.target.value)}
+                        // value={email}
+                        // onChange={e => setEmail(e.target.value)}
+                        name="email"
                     />  
                     <br />
                     <br />
@@ -80,12 +90,13 @@ export const Formulario = () => {
                         Fecha Alta
                     </label>
                     <input
-                        id="mascota"
+                        id="date"
                         type="date"
                         placeholder="Date"
                         className="w-full p-2 mt-2 text-gray-400 border-2 placeholder rounded-md"
-                        value={date}
-                        onChange={e => setDate(e.target.value)}
+                        // value={date}
+                        // onChange={e => setDate(e.target.value)}
+                        name="date"
                     />  
                     <br />
                     <br />
@@ -94,16 +105,24 @@ export const Formulario = () => {
                     </label>
                     <textarea
                         className="block w-full p-2 mt-2 font-bold text-gray-700 uppercase border-2 "
-                        value={observations}
-                        onChange={e => setObservations(e.target.value)}
+                        // value={observations}
+                        // onChange={e => setObservations(e.target.value)}
+                        name="observations"
                     >
                     </textarea>
                 </div>
-                <input
+                {/* <input
                     type="submit"
                     className="w-full p-3 font-bold text-white uppercase bg-indigo-600 cursor-pointer hover:bg-indigo-700 transition-colors"
                     value={ 'Agregar Paciente' }
-                />
+                /> */}
+                <button 
+                    type="button"
+                    onClick={handleSubmit}
+                    className="bg-indigo-600 w-full p-3 text-white uppercase font-bold hover:bg-indigo-700 cursor-pointer transition-colors"
+                >
+                    Agregar Paciente
+                </button>
             </form>
         </div>
     );
